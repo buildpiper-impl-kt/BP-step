@@ -4,7 +4,7 @@ WORKDIR /app
 
 RUN apk add --no-cache bash tar
 
-COPY demo.sh /app/build.sh
+COPY build.sh /app/build.sh
 
 RUN chmod +x /app/build.sh
 
