@@ -4,10 +4,10 @@ WORKDIR /app
 
 RUN apk add --no-cache bash tar
 
-COPY demo.sh /app/demo.sh
+COPY demo.sh /app/build.sh
 
-RUN chmod +x /app/demo.sh
+RUN chmod +x /app/build.sh
 
-ENTRYPOINT ["/app/demo.sh"]
+ENTRYPOINT ["/app/build.sh"]
 
 CMD ["/data/Install-Packages"]
