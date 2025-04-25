@@ -1,4 +1,6 @@
 #!/bin/bash
+source /opt/buildpiper/shell-functions/functions.sh
+source /opt/buildpiper/shell-functions/log-functions.sh
 
 function archive_name() {
      local path_of_file=$1
