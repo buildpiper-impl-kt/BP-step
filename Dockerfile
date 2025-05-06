@@ -1,12 +1,10 @@
-FROM alpine:3.20
+FROM alpine:3.18
 
-WORKDIR /app
+RUN apk add --no-cache curl python3 py3-pip bash \
+ && pip install awscli \
+ && rm -rf /var/cache/apk/*
 
-RUN apk add --no-cache bash tar
+COPY build.sh /build.sh
+RUN chmod +x /build.sh
 
-COPY build.sh /app/build.sh
-ADD BP-BASE-SHELL-STEPS /opt/buildpiper/shell-functions/
-
-RUN chmod +x /app/build.sh
-
-ENTRYPOINT ["/app/build.sh"]
+ENTRYPOINT ["/build.sh"]
