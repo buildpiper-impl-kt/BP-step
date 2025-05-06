@@ -2,21 +2,33 @@
 source /opt/buildpiper/shell-functions/functions.sh
 source /opt/buildpiper/shell-functions/log-functions.sh
 
-function archive_name() {
-     local path_of_file=$1
+function increase_size() {
+    local asg_name=$1
+    local asg_size=$2
+    local region=$3
 
-     if [ -z "$path_of_file" ]; then
-        echo "Path is empty. Please provide a valid path." 
+    if [[ -z "$asg_name" || -z "$asg_size" || -z "$region" ]]; then
+        echo "Error: Missing arguments."
+        echo "Usage: $0 asg name, asg size, region."
+        exit 1
+    fi
 
-     else 
-        if [ -e "$path_of_file" ]; then
-            archive_name=$(basename "$path_of_file")_$(date +%Y%m%d%H%M%S).tar.gz
-            tar -czvf "/data/$archive_name" "$path_of_file"
-            echo "File successfully zipped as: $archive_name"
-        else
-            echo "Error: Path does not exist."
-        fi
+    if ! command -v aws &> /dev/null; then
+        echo "Error: AWS CLI is not installed."
+        exit 2
+    fi
+
+    output=$(aws autoscaling update-auto-scaling-group --auto-scaling-group-name "$asg_name" --max-size "$asg_size" --region "$region" 2>&1)
+    status=$?
+
+    if [[ $status -ne 0 ]]; then
+        echo "Error: Failed to update Auto Scaling group."
+        echo "Output: $output"
+        exit $status
+    else
+        echo "Successfully updated auto scaling group $asg_name with max size $asg_size in region $region."
     fi
 }
 
-archive_name "$1"
+increase_size "$1" "$2" "$3"
+
