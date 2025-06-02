@@ -2,31 +2,21 @@
 source /opt/buildpiper/shell-functions/functions.sh
 source /opt/buildpiper/shell-functions/log-functions.sh
 
-graviton() {
-local source_code="$1"
 
-  if [ -z "$source_code" ]; then
-    echo "Git URL or local directory path is required"
+CODEBASE_LOCATION="${WORKSPACE}"/"${CODEBASE_DIR}"
+
+graviton_scan() {
+
+  cd ${CODEBASE_LOCATION}
+
+  if [ -z "$CODEBASE_LOCATION" ]; then
+    echo "Local directory path is required"
     return 1
   fi
 
-  if [[ "$source_code" == *.git ]]; then
-    local source_dir
-    source_dir=$(basename -s .git "$source_code")
-
-    mkdir -p ~/source_repo
-    echo "Using directory ~/source_repo"
-    cd ~/source_repo || return 1
-
-    if [ -d "$source_dir" ]; then
-      echo "Directory '$source_dir' already exists."
-    else
-      echo "Cloning $source_code..."
-      git clone "$source_code"
-    fi
-    cd
-    /usr/bin/porting-advisor ~/source_repo/"$source_dir" --output "$source_dir".html
-    /usr/bin/porting-advisor  ~/source_repo/"$source_dir" --output "$source_dir"-dependencies.xlsx --output-format dependencies
+  source_dir=$(basename "$CODEBASE_LOCATION")
+    /usr/bin/porting-advisor "$CODEBASE_LOCATION" --output "$source_dir".html
+    /usr/bin/porting-advisor  "$CODEBASE_LOCATION" --output "$source_dir"-dependencies.xlsx --output-format dependencies
     
    timestamp=$(date +%Y%m%d%H%M%S)
    base_dir=~/graviton_report
@@ -57,13 +47,15 @@ local source_code="$1"
   fi
     new_dep_name="$dep_dir/${source_dir}-dependencies_$timestamp.xlsx"
     mv ./"$source_dir"-dependencies.xlsx "$new_dep_name"
-  fi
 }
 
+if [ -d "${CODEBASE_LOCATION}" ]; then
+  graviton_scan
+else
+  echo "Error: ${CODEBASE_LOCATION} - No such file or directory exists"
+  exit 1
+fi
 
 
-graviton "$SOURCE_CODE"
 
 
-
-# sudo docker run -it   -v ~/graviton_report:/root/graviton_report   -e SOURCE_CODE=https://github.com/OT-MICROSERVICES/attendance-api.git   <image_name>
