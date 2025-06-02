@@ -2,7 +2,7 @@
 source /opt/buildpiper/shell-functions/functions.sh
 source /opt/buildpiper/shell-functions/log-functions.sh
 
-clone() {
+graviton() {
 local source_code="$1"
 
   if [ -z "$source_code" ]; then
@@ -101,7 +101,7 @@ local source_code="$1"
   fi
 }
 
-clone "$1"
+graviton "$1"
 
 
 
