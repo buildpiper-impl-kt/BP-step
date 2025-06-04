@@ -11,17 +11,19 @@ graviton_scan() {
     echo "Local directory path is required"
     return 1
   fi
-    /usr/bin/porting-advisor "$CODEBASE_LOCATION" --output "$CODEBASE_DIR".html
-    /usr/bin/porting-advisor  "$CODEBASE_LOCATION" --output "$CODEBASE_DIR"-dependencies.xlsx --output-format dependencies
+   porting-advisor "$CODEBASE_LOCATION" --output "$CODEBASE_DIR".html
+   porting-advisor  "$CODEBASE_LOCATION" --output "$CODEBASE_DIR"-dependencies.xlsx --output-format dependencies
+   xlsx2csv "$CODEBASE_DIR"-dependencies.xlsx > "$CODEBASE_DIR".csv
     
-   base_dir="$CODEBASE_LOCATION/graviton_report" #change
+    
+   base_dir="$CODEBASE_LOCATION/graviton_report" #chnage
 
   if [ ! -d "$base_dir" ]; then
     mkdir -p "$base_dir"
     echo "Created base directory: $base_dir"
   fi
 
-  report_dir="$base_dir/html_report"
+  report_dir="$base_dir/reports"
   if [ ! -d "$report_dir" ]; then
     mkdir -p "$report_dir"
     echo "Created directory $report_dir"
@@ -30,16 +32,9 @@ graviton_scan() {
   fi
 
     mv ./"$CODEBASE_DIR".html "$report_dir"
-
-
-  dep_dir="$base_dir/dependencies"
-  if [ ! -d "$dep_dir" ]; then
-    mkdir -p "$dep_dir"
-    echo "Created directory $dep_dir"
-  else
-    echo "Directory $dep_dir already exists"
-  fi
-    mv ./"$CODEBASE_DIR"-dependencies.xlsx "$dep_dir"
+    mv ./"$CODEBASE_DIR"-dependencies.xlsx "$report_dir"
+    mv ./"$CODEBASE_DIR".csv "$report_dir"
+  
 }
 
 if [ -d "${CODEBASE_LOCATION}" ]; then
@@ -49,7 +44,6 @@ else
   exit 1
 fi
 
-#cp -rf reports/* /bp/execution_dir/${GLOBAL_TASK_ID}/
 #dest_dir="/bp/execution_dir/${GLOBAL_TASK_ID}/"
 dest_dir="/bp/execution_dir/test/"
 mkdir -p "$dest_dir"
