@@ -1,6 +1,4 @@
-
 FROM alpine:3.20 AS builder
-
 
 RUN apk add --no-cache \
     openjdk17 \
@@ -17,7 +15,6 @@ ENV PATH=$PATH:$JAVA_HOME/bin
 
 WORKDIR /app
 
-
 RUN curl -L -o graviton.zip https://github.com/aws/porting-advisor-for-graviton/archive/refs/heads/main.zip && \
     unzip graviton.zip && \
     mv porting-advisor-for-graviton-main/src ./src && \
@@ -26,12 +23,10 @@ RUN curl -L -o graviton.zip https://github.com/aws/porting-advisor-for-graviton/
     mv porting-advisor-for-graviton-main/getBinaryName.sh ./getBinaryName.sh && \
     mv porting-advisor-for-graviton-main/requirements-build.txt ./requirements-build.txt
 
-
 RUN python3 -m venv /app/.venv && \
     . /app/.venv/bin/activate && \
     pip install --upgrade pip && \
     pip install -r requirements-build.txt && \
-    pip install xlsx2csv && \
     FILE_NAME=porting-advisor ./build.sh && \
     mv dist/porting-advisor /opt/porting-advisor
 
