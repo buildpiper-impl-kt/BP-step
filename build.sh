@@ -14,7 +14,7 @@ graviton_scan() {
     /usr/bin/porting-advisor "$CODEBASE_LOCATION" --output "$CODEBASE_DIR".html
     /usr/bin/porting-advisor  "$CODEBASE_LOCATION" --output "$CODEBASE_DIR"-dependencies.xlsx --output-format dependencies
     
-   base_dir="$CODEBASE_LOCATION/graviton_report" #chnage
+   base_dir="$CODEBASE_LOCATION/graviton_report" #change
 
   if [ ! -d "$base_dir" ]; then
     mkdir -p "$base_dir"
