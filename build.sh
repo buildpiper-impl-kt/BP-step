@@ -2,26 +2,36 @@
 source /opt/buildpiper/shell-functions/functions.sh
 source /opt/buildpiper/shell-functions/log-functions.sh
 
-function increase_size() {
-    local cluster_name=$1
-    local node_group_name=$2
-    local min_size=$3
-    local max_size=$4
-    local desired_size=$5
-    local region=$6
+SESSION_NAME="eks-update-session"
 
-    if [[ -z "$cluster_name" || -z "$node_group_name" || -z "$min_size" || -z "$max_size" || -z "$desired_size" || -z "$region" ]]; then
+function assume_role() {
+    creds=$(aws sts assume-role --role-arn arn:aws:iam::$ACCOUNT_ID:role/$ROLE_NAME --role-session-name "$SESSION_NAME" --output json)
+    export AWS_ACCESS_KEY_ID=$(echo "$creds" | jq -r '.Credentials.AccessKeyId')
+    export AWS_SECRET_ACCESS_KEY=$(echo "$creds" | jq -r '.Credentials.SecretAccessKey')
+    export AWS_SESSION_TOKEN=$(echo "$creds" | jq -r '.Credentials.SessionToken')
+    if [ $? -ne 0 ]; then
+          echo "Failed to assume role."
+          exit 1
+    fi
+}
+
+function increase_size() {
+
+    if [[ -z "$CLUSTER_NAME" || -z "$NODE_GROUP_NAME" || -z "$MIN_SIZE" || -z "$MAX_SIZE" || -z "$DESIRED_SIZE" || -z "$REGION" ]]; then
         echo "Error: Missing arguments."
-        echo "Usage: $0 cluster_name, node group name, min size, max size, desired size, region."
+        echo "Usage: $0 CLUSTER_NAME NODE_GROUP_NAME MIN_SIZE MAX_SIZE DESIRED_SIZE REGION"
         exit 1
     fi
 
-    if ! command -v aws &> /dev/null; then
-        echo "Error: AWS CLI is not installed."
-        exit 2
-    fi
+    assume_role
 
-    output=$(aws eks update-nodegroup-config --cluster-name "$cluster_name" --nodegroup-name "$node_group_name" --scaling-config minSize="$min_size",maxSize="$max_size",desiredSize="$desired_size" --region "$region" 2>&1)
+    output=$(aws eks update-nodegroup-config \
+        --cluster-name "$CLUSTER_NAME" \
+        --nodegroup-name "$NODE_GROUP_NAME" \
+        --scaling-config minSize="$MIN_SIZE",maxSize="$MAX_SIZE",desiredSize="$DESIRED_SIZE" \
+        --region "$REGION" 2>&1)
+
+
     status=$?
 
     if [[ $status -ne 0 ]]; then
@@ -29,8 +39,9 @@ function increase_size() {
         echo "Output: $output"
         exit $status
     else
-        echo "Successfully updated node group '$node_group_name' in cluster '$cluster_name' with max size $max_size , min size $min_size , and desired size $desired_size in region $region."         
+        echo "Successfully updated node group '$NODE_GROUP_NAME' in cluster '$CLUSTER_NAME' with max size $MAX_SIZE , min size $MIN_SIZE , and desired size $DESIRED_SIZE in REGION $REGION."         
     fi
 }
 
-increase_size "$1" "$2" "$3" "$4" "$5" "$6"
+increase_size 
+
