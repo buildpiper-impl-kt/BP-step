@@ -1,10 +1,10 @@
-FROM alpine:3.18
+FROM amazon/aws-cli
 
-RUN apk add --no-cache curl python3 py3-pip bash \
- && pip install awscli \
- && rm -rf /var/cache/apk/*
+RUN yum update -y 
+RUN yum install jq gettext -y
 
-COPY build.sh /build.sh
-RUN chmod +x /build.sh
+COPY build.sh .
+RUN chmod +x build.sh
 
-ENTRYPOINT ["/build.sh"]
+ENTRYPOINT ["/bin/bash", "./build.sh"]
+
