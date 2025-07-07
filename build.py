@@ -11,7 +11,7 @@ YELLOW = '\033[93m'
 GREEN = '\033[92m'
 RESET = '\033[0m'
 
-required_vars = ["MYSQL_HOST", "MYSQL_DB", "ENV_FILTER", "START_DATE", "END_DATE"]
+required_vars = ["MYSQL_DB", "ENV_NAME", "START_DATE", "END_DATE"]
 missing_vars = [var for var in required_vars if not os.getenv(var)]
 
 if missing_vars:
@@ -20,11 +20,16 @@ if missing_vars:
 else:
     print(f"{GREEN}PASS: All required environment variables are set.{RESET}")
 
+# Get environment variables
+workspace = os.getenv("WORKSPACE")
+codebase_dir = os.getenv("CODEBASE_DIR")
+GLOBAL_TASK_ID = os.getenv("GLOBAL_TASK_ID")
+DESTINATION_DIR = f"/bp/execution_dir/{GLOBAL_TASK_ID}/"
 db_host = os.getenv("MYSQL_HOST", "db")
 db_user = os.getenv("MYSQL_USER", "root")
 db_pass = os.getenv("MYSQL_PASS", "password")
 db_name = os.getenv("MYSQL_DB")
-env_filter_raw = os.getenv("ENV_FILTER")
+env_filter_raw = os.getenv("ENV_NAME")
 start_date_input = os.getenv("START_DATE")
 end_date_input = os.getenv("END_DATE")
 sleep_seconds = int(os.getenv("SLEEP_SECONDS", "5"))
@@ -95,11 +100,10 @@ try:
     df.to_csv(csv_filename, index=False)
     df.to_excel(xlsx_filename, index=False)
     print(f"{GREEN}PASS: Exported {csv_filename} and {xlsx_filename}{RESET}")
-
-    destination_dir = "/bp/workspace"
-    shutil.move(csv_filename, os.path.join(destination_dir, csv_filename))
-    shutil.move(xlsx_filename, os.path.join(destination_dir, xlsx_filename))
-    print(f"{GREEN}PASS: Files moved to {destination_dir}{RESET}")
+    
+    shutil.move(csv_filename, os.path.join(DESTINATION_DIR, csv_filename))
+    shutil.move(xlsx_filename, os.path.join(DESTINATION_DIR, xlsx_filename))
+    print(f"{GREEN}PASS: Files moved to {DESTINATION_DIR}{RESET}")
 
 except Exception as e:
     print(f"{RED}ERROR: {e}{RESET}")
