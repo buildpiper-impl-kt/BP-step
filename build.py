@@ -32,10 +32,10 @@ db_name = os.getenv("MYSQL_DB")
 env_filter_raw = os.getenv("ENV_NAME")
 start_date_input = os.getenv("START_DATE")
 end_date_input = os.getenv("END_DATE")
-sleep_seconds = int(os.getenv("SLEEP_SECONDS", "5"))
+SLEEP_DURATION = int(os.getenv("SLEEP_DURATION", "5"))
 
 
-time.sleep(sleep_seconds)
+time.sleep(SLEEP_DURATION)
 
 env_filter = tuple(env.strip() for env in env_filter_raw.split(",") if env.strip())
 
@@ -100,7 +100,7 @@ try:
     df.to_csv(csv_filename, index=False)
     df.to_excel(xlsx_filename, index=False)
     print(f"{GREEN}PASS: Exported {csv_filename} and {xlsx_filename}{RESET}")
-    
+
     shutil.move(csv_filename, os.path.join(DESTINATION_DIR, csv_filename))
     shutil.move(xlsx_filename, os.path.join(DESTINATION_DIR, xlsx_filename))
     print(f"{GREEN}PASS: Files moved to {DESTINATION_DIR}{RESET}")
