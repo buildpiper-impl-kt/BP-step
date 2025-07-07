@@ -20,7 +20,7 @@ if missing_vars:
 else:
     print(f"{GREEN}PASS: All required environment variables are set.{RESET}")
 
-db_host = os.getenv("MYSQL_HOST")
+db_host = os.getenv("MYSQL_HOST", "db")
 db_user = os.getenv("MYSQL_USER", "root")
 db_pass = os.getenv("MYSQL_PASS", "password")
 db_name = os.getenv("MYSQL_DB")
