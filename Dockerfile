@@ -1,8 +1,8 @@
-FROM python:3.11-slim
+# FROM python:3.11-slim
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc \
- && rm -rf /var/lib/apt/lists/*
+# RUN apt-get update && apt-get install -y --no-install-recommends \
+#     gcc \
+#  && rm -rf /var/lib/apt/lists/*
 
 # RUN useradd -m -s /bin/bash buildpiper
 # RUN mkdir -p /home/buildpiper /bp/workspace
@@ -16,5 +16,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # COPY --chown=buildpiper:buildpiper requirements.txt .
 # COPY --chown=buildpiper:buildpiper build.py .
 
+# RUN pip install --no-cache-dir -r requirements.txt
+# ENTRYPOINT ["python", "/home/buildpiper/build.py"]
+
+FROM python:3.11-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+ && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements before installing
+COPY requirements.txt .
+
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Then copy the actual app
+COPY build.py .
+
 ENTRYPOINT ["python", "build.py"]
+
