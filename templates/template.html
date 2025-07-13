@@ -103,7 +103,7 @@
     {# Determine which banner to show #}
     {% if control_plane_issue or nodegroup_issue or addon_critical_issue or api_issue %}
         <div class="warning-banner">
-            <strong>⚠️ Upgrade completed with critical issues:</strong>
+            <strong>⚠️ Upgrade completed with issues:</strong>
             <ul style="text-align: left; margin-top: 10px;">
                 {% if control_plane_issue %}
                     <li>Control Plane upgrade failed.</li>
